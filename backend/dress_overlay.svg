@@ -1,0 +1,19 @@
+<svg width="500" height="800" viewBox="0 0 500 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
+    </filter>
+  </defs>
+  
+  <!-- Dress Bodice -->
+  <path d="M150,200 C150,200 180,280 140,350 L360,350 C320,280 350,200 350,200 C300,220 200,220 150,200 Z" fill="white" fill-opacity="0.9" stroke="#f0f0f0" stroke-width="2"/>
+  
+  <!-- Dress Skirt -->
+  <path d="M140,350 L360,350 C380,500 480,750 500,800 L0,800 C20,750 120,500 140,350 Z" fill="white" fill-opacity="0.85" />
+  
+  <!-- Veil / Glow Effect -->
+  <ellipse cx="250" cy="180" rx="120" ry="150" fill="white" fill-opacity="0.3" filter="url(#blur)" />
+  
+  <!-- Decorative details -->
+  <path d="M150,350 Q250,400 350,350" stroke="#e0e0e0" stroke-width="3" fill="none" />
+</svg>
