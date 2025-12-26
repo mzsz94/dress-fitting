@@ -97,7 +97,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
             
             return res.json({
                 success: true,
-                transformedImageUrl: `/proxy/${port}/uploads/${outputFilename}`,
+                transformedImageUrl: `/uploads/${outputFilename}`,
                 message: "Nano Banana AI successfully generated your wedding dress photo!"
             });
         } 
@@ -164,7 +164,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
 
     res.json({
       success: true,
-      transformedImageUrl: `/proxy/${port}/uploads/${outputFilename}`,
+      transformedImageUrl: `/uploads/${outputFilename}`,
       message: process.env.GEMINI_API_KEY 
         ? "Nano Banana API processed the request! (Hybrid Mode)" 
         : "Wedding dress fitting complete! (Offline Mode - Set API Key for AI)"

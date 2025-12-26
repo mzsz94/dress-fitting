@@ -25,7 +25,7 @@ function App() {
 
     try {
       // Use proxy path for cloud environment
-      const response = await fetch('/proxy/2000/api/transform', {
+      const response = await fetch('/api/transform', {
         method: 'POST',
         body: formData,
       });

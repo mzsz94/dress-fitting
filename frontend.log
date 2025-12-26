@@ -1,9 +1,0 @@
-
-> frontend@0.0.0 dev
-> vite --host
-
-
-  ROLLDOWN-VITE v7.2.5  ready in 591 ms
-
-  ➜  Local:   http://localhost:5173/proxy/5173/
-  ➜  Network: http://10.178.0.2:5173/proxy/5173/
