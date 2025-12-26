@@ -19,7 +19,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, path.join(__dirname, 'uploads'));
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -28,8 +28,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
 }
 
 // 🔑 Google Nano Banana API Key Configuration
@@ -44,7 +45,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
 
     const inputPath = req.file.path;
     const outputFilename = 'transformed_' + req.file.filename;
-    const outputPath = path.join('uploads', outputFilename);
+    const outputPath = path.join(__dirname, 'uploads', outputFilename);
 
     console.log('Processing request for:', inputPath);
 
@@ -62,7 +63,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
         const model = genAI.getGenerativeModel({ model: modelName });
 
         // Prompt specifically for image editing
-        const prompt = "Edit this image. Replace the person's outfit with a high-quality, elegant white wedding dress. Maintain the exact face, pose, and background. Return the image.";
+        const prompt = "Edit this image. Replace the person's outfit with a high-quality, elegant white wedding dress. Maintain the exact face, pose, and the background. Return the image.";
         
         const result = await model.generateContent([
             prompt,
@@ -77,7 +78,6 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
         const response = await result.response;
         
         // Check if the response actually contains an image
-        // (Structure depends on SDK version, usually in parts)
         const candidates = response.candidates;
         let aiImageBuffer = null;
 
@@ -103,6 +103,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
         } 
         
         console.log("ℹ️ AI returned text/no-image:", response.text());
+
         console.log("Falling back to overlay...");
         // Fallback execution continues below...
         
