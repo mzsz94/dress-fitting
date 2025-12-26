@@ -91,50 +91,6 @@ function App() {
           </button>
         )}
       </main>
-
-      <style jsx>{`
-        .container {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 2rem;
-          text-align: center;
-          font-family: 'Pretendard', sans-serif;
-        }
-        header h1 { color: #ff69b4; margin-bottom: 0.5rem; }
-        .upload-section { margin: 2rem 0; }
-        .hidden { display: none; }
-        .upload-btn, .transform-btn {
-          background: #ff69b4;
-          color: white;
-          padding: 0.8rem 2rem;
-          border-radius: 50px;
-          cursor: pointer;
-          border: none;
-          font-size: 1.1rem;
-          transition: transform 0.2s;
-        }
-        .upload-btn:hover, .transform-btn:hover { transform: scale(1.05); }
-        .transform-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .display-section {
-          display: flex;
-          gap: 2rem;
-          justify-content: center;
-          flex-wrap: wrap;
-          margin-top: 2rem;
-        }
-        .image-box {
-          flex: 1;
-          min-width: 300px;
-          border: 2px dashed #ff69b4;
-          padding: 1rem;
-          border-radius: 15px;
-        }
-        .image-box img {
-          width: 100%;
-          height: auto;
-          border-radius: 10px;
-        }
-      `}</style>
     </div>
   )
 }
