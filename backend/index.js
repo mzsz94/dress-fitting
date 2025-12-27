@@ -37,17 +37,24 @@ if (!fs.existsSync(uploadsDir)) {
 // Please set GEMINI_API_KEY in your .env file
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.post('/api/transform', upload.single('image'), async (req, res) => {
+app.post('/api/transform', upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'dress', maxCount: 1 }
+]), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).send('No image uploaded.');
+    if (!req.files || !req.files['image']) {
+      return res.status(400).send('No user image uploaded.');
     }
 
-    const inputPath = req.file.path;
-    const outputFilename = 'transformed_' + req.file.filename;
+    const userFile = req.files['image'][0];
+    const dressFile = req.files['dress'] ? req.files['dress'][0] : null;
+
+    const inputPath = userFile.path;
+    const outputFilename = 'transformed_' + userFile.filename;
     const outputPath = path.join(__dirname, 'uploads', outputFilename);
 
     console.log('Processing request for:', inputPath);
+    if (dressFile) console.log('Dress reference provided:', dressFile.path);
 
     // 1. Try to use Real Nano Banana API if Key exists
     if (process.env.GEMINI_API_KEY) {
@@ -56,25 +63,39 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
       try {
         const imageBuffer = fs.readFileSync(inputPath);
         
-        // Use the dedicated Image Generation/Editing model found in the list
-        const modelName = "gemini-2.5-flash-image"; 
+        // Use the dedicated Image Generation/Editing model
+        const modelName = "nano-banana-pro-preview"; 
         console.log(`✨ Using Image Model: ${modelName}`);
         
         const model = genAI.getGenerativeModel({ model: modelName });
 
-        // Prompt specifically for image editing
-        const prompt = "Edit this image. Replace the person's outfit with a high-quality, elegant white wedding dress. Maintain the exact face, pose, and the background. Return the image.";
+        // Step 1: Generate/Edit User Image
+        console.log("🎨 Generating final image with Nano Banana...");
         
-        const result = await model.generateContent([
-            prompt,
+        const finalPrompt = dressFile 
+            ? "I have provided two images: 1. A person (User Photo), 2. A wedding dress (Reference Dress). Please edit the User Photo to dress the person in the exact wedding dress shown in the Reference Dress photo. Maintain the person's face, hair, pose, and background exactly as they are. Make it look completely natural and photorealistic. Return the result as an image."
+            : "Edit this image to dress the person in a high-quality, elegant white wedding dress. Maintain the person's face, hair, pose, and background exactly as they are. Make it look completely natural and photorealistic. Return the result as an image.";
+
+        const finalParts = [
+            { text: finalPrompt },
             {
                 inlineData: {
                     data: fs.readFileSync(inputPath).toString('base64'),
-                    mimeType: req.file.mimetype
+                    mimeType: userFile.mimetype
                 }
             }
-        ]);
+        ];
 
+        if (dressFile) {
+            finalParts.push({
+                inlineData: {
+                    data: fs.readFileSync(dressFile.path).toString('base64'),
+                    mimeType: dressFile.mimetype
+                }
+            });
+        }
+        
+        const result = await model.generateContent({ contents: [{ role: "user", parts: finalParts }] });
         const response = await result.response;
         
         // Check if the response actually contains an image
@@ -102,7 +123,7 @@ app.post('/api/transform', upload.single('image'), async (req, res) => {
             });
         } 
         
-        console.log("ℹ️ AI returned text/no-image:", response.text());
+        console.log("ℹ️ AI returned text/no-image. Full Response Text:", response.text());
 
         console.log("Falling back to overlay...");
         // Fallback execution continues below...

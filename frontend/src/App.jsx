@@ -2,26 +2,36 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [userFile, setUserFile] = useState(null);
+  const [userPreviewUrl, setUserPreviewUrl] = useState(null);
+  const [dressFile, setDressFile] = useState(null);
+  const [dressPreviewUrl, setDressPreviewUrl] = useState(null);
   const [resultUrl, setResultUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      if (type === 'user') {
+        setUserFile(file);
+        setUserPreviewUrl(URL.createObjectURL(file));
+      } else if (type === 'dress') {
+        setDressFile(file);
+        setDressPreviewUrl(URL.createObjectURL(file));
+      }
       setResultUrl(null);
     }
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!userFile) return;
 
     setLoading(true);
     const formData = new FormData();
-    formData.append('image', selectedFile);
+    formData.append('image', userFile);
+    if (dressFile) {
+      formData.append('dress', dressFile);
+    }
 
     try {
       // Use proxy path for cloud environment
@@ -52,36 +62,62 @@ function App() {
       </header>
 
       <main>
-        <div className="upload-section">
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleFileChange} 
-            id="file-input"
-            className="hidden"
-          />
-          <label htmlFor="file-input" className="upload-btn">
-            {selectedFile ? '사진 변경하기' : '본인 사진 업로드'}
-          </label>
+        <div className="upload-container">
+            {/* User Image Upload */}
+            <div className="upload-section">
+              <h3>1. 본인 사진</h3>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => handleFileChange(e, 'user')} 
+                id="user-input"
+                className="hidden"
+              />
+              <label htmlFor="user-input" className="upload-btn">
+                {userFile ? '사진 변경' : '업로드'}
+              </label>
+            </div>
+
+            {/* Dress Reference Upload */}
+            <div className="upload-section">
+              <h3>2. 입고 싶은 드레스 (선택)</h3>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => handleFileChange(e, 'dress')} 
+                id="dress-input"
+                className="hidden"
+              />
+              <label htmlFor="dress-input" className="upload-btn">
+                {dressFile ? '드레스 변경' : '참고 드레스 업로드'}
+              </label>
+            </div>
         </div>
 
         <div className="display-section">
-          {previewUrl && (
+          {userPreviewUrl && (
             <div className="image-box">
               <h3>원본 사진</h3>
-              <img src={previewUrl} alt="Original" />
+              <img src={userPreviewUrl} alt="User Original" />
+            </div>
+          )}
+
+          {dressPreviewUrl && (
+            <div className="image-box">
+              <h3>참고 드레스</h3>
+              <img src={dressPreviewUrl} alt="Dress Reference" />
             </div>
           )}
 
           {resultUrl && (
-            <div className="image-box">
-              <h3>웨딩드레스 피팅 결과</h3>
+            <div className="image-box result-box">
+              <h3>피팅 결과</h3>
               <img src={resultUrl} alt="Transformed" />
             </div>
           )}
         </div>
 
-        {selectedFile && !resultUrl && (
+        {userFile && !resultUrl && (
           <button 
             onClick={handleUpload} 
             className="transform-btn"

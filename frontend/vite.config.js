@@ -9,6 +9,13 @@ export default defineConfig({
     host: true,
     port: 5173,
     strictPort: true,
-    allowedHosts: ['sz-code.mzsz.site', 'wed-fitting.mzsz.site']
+    allowedHosts: ['sz-code.mzsz.site', 'wed-fitting.mzsz.site'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:2000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   }
 })
